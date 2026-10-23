@@ -1,99 +1,117 @@
 @extends('layouts.app')
 
-@section('title', 'Transaksi Penjualan Baru (Stock-Out) - Gavora ERP')
+@section('title', 'Kasir Penjualan Baru (POS) - Gavora ERP')
 
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">Kasir & Transaksi Penjualan (Stock-Out)</h3>
-            <p class="text-muted mb-0">Input penjualan barang ke pelanggan. Kuantitas stok otomatis dikurangi dan divalidasi ketat di server.</p>
+            <h4 class="fw-bold text-dark mb-1">Kasir & Transaksi Penjualan</h4>
+            <p class="text-muted mb-0 small">Catat penjualan barang ke pelanggan. Kuantitas stok produk akan langsung disesuaikan secara otomatis.</p>
         </div>
-        <a href="{{ route('sales.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Kembali ke Riwayat
+        <a href="{{ route('sales.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Riwayat Penjualan
         </a>
-    </div>
-
-    <!-- Alert Integritas Server-Side -->
-    <div class="alert alert-primary d-flex align-items-center mb-4 border-0 shadow-sm rounded-3">
-        <i class="bi bi-shield-check fs-3 me-3 text-primary"></i>
-        <div>
-            <div class="fw-bold">Proteksi Integritas Stok & Harga Sisi Server (Server-Side Enforcement):</div>
-            <div class="small">
-                Harga satuan dan ketersediaan stok produk akan dihitung ulang langsung dari database server menggunakan <code>lockForUpdate()</code>. Total penjualan yang disimpan tidak mempercayai input dari browser.
-            </div>
-        </div>
     </div>
 
     <form action="{{ route('sales.store') }}" method="POST" id="saleForm" novalidate>
         @csrf
 
-        <!-- Header Card -->
-        <div class="card border-0 shadow-sm rounded-3 mb-4">
-            <div class="card-header bg-white py-3">
-                <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-person-badge me-1"></i> Informasi Kasir & Waktu Transaksi</h6>
-            </div>
-            <div class="card-body p-4">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Petugas Kasir</label>
-                        <input type="text" class="form-control bg-light" value="{{ auth()->user()->name }} ({{ ucfirst(auth()->user()->role) }})" readonly>
+        <div class="row g-4">
+            <!-- Kolom Kiri: Form Input & Keranjang Barang -->
+            <div class="col-lg-8">
+                <!-- Info Kasir & Tanggal -->
+                <div class="card mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-person-badge me-2 text-primary"></i>Informasi Transaksi</h6>
                     </div>
+                    <div class="card-body p-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Petugas Kasir Bertugas</label>
+                                <input type="text" class="form-control bg-light" value="{{ auth()->user()->name }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="sold_at" class="form-label small fw-semibold text-secondary">Tanggal & Waktu Transaksi</label>
+                                <input type="datetime-local" name="sold_at" id="sold_at" 
+                                       class="form-control @error('sold_at') is-invalid @enderror" 
+                                       value="{{ old('sold_at', now()->format('Y-m-d\TH:i')) }}">
+                                @error('sold_at')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                    <div class="col-md-6">
-                        <label for="sold_at" class="form-label fw-semibold">Tanggal & Waktu Transaksi</label>
-                        <input type="datetime-local" name="sold_at" id="sold_at" 
-                               class="form-control @error('sold_at') is-invalid @enderror" 
-                               value="{{ old('sold_at', now()->format('Y-m-d\TH:i')) }}">
-                        @error('sold_at')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                <!-- Keranjang Item Produk -->
+                <div class="card">
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-cart3 me-2 text-success"></i>Daftar Barang Penjualan</h6>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" id="addRowBtn">
+                            <i class="bi bi-plus-lg me-1"></i> + Tambah Baris Barang
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle mb-0" id="itemsTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 45%;">Pilih Barang & Sisa Stok <span class="text-danger">*</span></th>
+                                        <th style="width: 20%;" class="text-end">Harga Satuan (Rp)</th>
+                                        <th style="width: 15%;" class="text-center">Kuantitas <span class="text-danger">*</span></th>
+                                        <th style="width: 15%;" class="text-end">Subtotal (Rp)</th>
+                                        <th style="width: 5%;" class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsTableBody">
+                                    <!-- Diisi oleh Javascript / old('items') -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Items Card -->
-        <div class="card border-0 shadow-sm rounded-3 mb-4">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <div>
-                    <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-cart3 me-1"></i> Keranjang Item Penjualan</h6>
-                    <small class="text-muted">Pilih produk dan tentukan jumlah yang dibeli pelanggan.</small>
+            <!-- Kolom Kanan: Ringkasan Transaksi (Order Summary) -->
+            <div class="col-lg-4">
+                <div class="card sticky-summary">
+                    <div class="card-header py-3">
+                        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-receipt me-2 text-primary"></i>Ringkasan Transaksi</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2 small text-secondary">
+                            <span>Kasir Bertugas:</span>
+                            <span class="fw-semibold text-dark">{{ auth()->user()->name }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2 small text-secondary">
+                            <span>Total Baris Barang:</span>
+                            <span class="fw-semibold text-dark" id="summaryTotalRows">0 Item</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3 small text-secondary">
+                            <span>Total Unit Barang:</span>
+                            <span class="fw-semibold text-dark" id="summaryTotalQty">0 Unit</span>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <div class="mb-4">
+                            <span class="text-secondary small fw-medium d-block mb-1">Total Tagihan Pembayaran:</span>
+                            <h3 class="fw-bold text-success mb-0" id="grandTotalDisplay">Rp 0</h3>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success py-2 fw-semibold shadow-sm">
+                                <i class="bi bi-check2-circle me-1"></i> Proses Penjualan (Selesai)
+                            </button>
+                            <a href="{{ route('sales.index') }}" class="btn btn-light border py-2">
+                                Batal
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <button type="button" class="btn btn-outline-success btn-sm fw-semibold" id="addRowBtn">
-                    <i class="bi bi-plus-lg me-1"></i> + Tambah Baris Produk
-                </button>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle mb-0" id="itemsTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 45%;">Pilih Produk & Info Stok <span class="text-danger">*</span></th>
-                                <th style="width: 20%;" class="text-end">Harga Satuan Resmi (Rp)</th>
-                                <th style="width: 15%;" class="text-center">Kuantitas Jual <span class="text-danger">*</span></th>
-                                <th style="width: 15%;" class="text-end">Subtotal Estimasi</th>
-                                <th style="width: 5%;" class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemsTableBody">
-                            <!-- Diisi oleh Javascript / old('items') -->
-                        </tbody>
-                        <tfoot class="table-light">
-                            <tr>
-                                <th colspan="3" class="text-end fw-bold fs-6">Grand Total Pembayaran:</th>
-                                <th class="text-end fw-bold fs-5 text-success" id="grandTotalDisplay">Rp 0</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer bg-white py-3 d-flex justify-content-end gap-2">
-                <a href="{{ route('sales.index') }}" class="btn btn-light border">Batal</a>
-                <button type="submit" class="btn btn-success px-4 fw-semibold shadow-sm">
-                    <i class="bi bi-check2-circle me-1"></i> Selesaikan Transaksi Penjualan (Stock-Out)
-                </button>
             </div>
         </div>
     </form>
@@ -114,7 +132,7 @@
         const selectedProductId = itemData ? itemData.product_id : '';
         const initialQty = itemData ? itemData.quantity : 1;
 
-        let productOptions = '<option value="">-- Pilih Produk yang Dijual --</option>';
+        let productOptions = '<option value="">-- Pilih Barang --</option>';
         availableProducts.forEach(prod => {
             const isSelected = selectedProductId == prod.id ? 'selected' : '';
             const isOutOfStock = prod.stock <= 0;
@@ -138,7 +156,7 @@
             <td>
                 <input type="number" min="1" name="items[${rowIndex}][quantity]" class="form-control text-center quantity-input" value="${initialQty}" required oninput="calculateSubtotal(${rowIndex})">
             </td>
-            <td class="text-end fw-semibold text-success subtotal-display" id="subtotal-${rowIndex}">
+            <td class="text-end fw-semibold text-dark subtotal-display" id="subtotal-${rowIndex}">
                 Rp 0
             </td>
             <td class="text-center">
@@ -150,19 +168,19 @@
 
         tbody.appendChild(tr);
 
-        // Jika ada produk yang terpilih saat inisialisasi
         const select = tr.querySelector('.product-select');
         if (select.value) {
             onProductChange(select, rowIndex);
         }
 
         rowIndex++;
+        calculateGrandTotal();
     }
 
     function onProductChange(selectElement, index) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-        const stock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
+        const price = parseFloat(selectedOption?.getAttribute('data-price')) || 0;
+        const stock = parseInt(selectedOption?.getAttribute('data-stock')) || 0;
 
         const row = document.getElementById(`row-${index}`);
         const priceDisplay = document.getElementById(`price-display-${index}`);
@@ -174,11 +192,11 @@
             qtyInput.setAttribute('max', stock);
 
             if (stock <= 0) {
-                stockHint.innerHTML = `<span class="badge bg-danger">STOK HABIS (0 unit)</span> Produk tidak dapat dijual.`;
+                stockHint.innerHTML = `<span class="badge bg-danger-subtle text-danger">Stok Habis</span>`;
             } else if (stock <= 5) {
-                stockHint.innerHTML = `<span class="badge bg-warning text-dark">Stok Kritis: Sisa ${stock} unit</span>`;
+                stockHint.innerHTML = `<span class="badge bg-warning-subtle text-warning-emphasis">Sisa Stok Terbatas: ${stock} Unit</span>`;
             } else {
-                stockHint.innerHTML = `<span class="badge bg-success">Stok Tersedia: ${stock} unit</span>`;
+                stockHint.innerHTML = `<span class="badge bg-success-subtle text-success">Stok Tersedia: ${stock} Unit</span>`;
             }
         } else {
             priceDisplay.innerText = 'Rp 0';
@@ -208,15 +226,23 @@
 
     function calculateGrandTotal() {
         let grandTotal = 0;
+        let totalQty = 0;
+        let rowCount = 0;
+
         document.querySelectorAll('#itemsTableBody tr').forEach(row => {
             const select = row.querySelector('.product-select');
             const selectedOption = select?.options[select.selectedIndex];
             const price = parseFloat(selectedOption?.getAttribute('data-price')) || 0;
             const qty = parseInt(row.querySelector('.quantity-input')?.value) || 0;
+            
             grandTotal += (price * qty);
+            totalQty += qty;
+            rowCount++;
         });
 
         document.getElementById('grandTotalDisplay').innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+        document.getElementById('summaryTotalRows').innerText = rowCount + ' Item';
+        document.getElementById('summaryTotalQty').innerText = totalQty + ' Unit';
     }
 
     function removeRow(index) {
@@ -235,7 +261,6 @@
     document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('addRowBtn').addEventListener('click', () => createRow());
 
-        // Inisialisasi baris dari old items (jika redirect kembali karena validasi error)
         if (Array.isArray(oldItems) && oldItems.length > 0) {
             oldItems.forEach(item => createRow(item));
         } else {

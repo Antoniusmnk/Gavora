@@ -6,23 +6,23 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">Master Kategori Produk</h3>
-            <p class="text-muted mb-0">Kelola pengelompokan produk dan klasifikasi inventaris barang.</p>
+            <h4 class="fw-bold text-dark mb-1">Kategori Produk</h4>
+            <p class="text-muted mb-0 small">Kelola klasifikasi dan pengelompokan barang inventaris perusahaan.</p>
         </div>
         <div>
-            <a href="{{ route('categories.create') }}" class="btn btn-primary shadow-sm">
-                <i class="bi bi-tag-fill me-1"></i> Tambah Kategori Baru
+            <a href="{{ route('categories.create') }}" class="btn btn-primary btn-sm shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> + Tambah Kategori Baru
             </a>
         </div>
     </div>
 
     <!-- Search Card -->
-    <div class="card border-0 shadow-sm rounded-3 mb-4">
+    <div class="card mb-4">
         <div class="card-body p-3">
             <form action="{{ route('categories.index') }}" method="GET" class="row g-2 align-items-center">
                 <div class="col-md-9">
                     <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <span class="input-group-text bg-white border-end-0 text-secondary"><i class="bi bi-search"></i></span>
                         <input type="text" name="search" class="form-control border-start-0 ps-0" 
                                placeholder="Cari nama kategori..." value="{{ request('search') }}">
                     </div>
@@ -42,14 +42,14 @@
     </div>
 
     <!-- Categories Table Card -->
-    <div class="card border-0 shadow-sm rounded-3">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-            <h6 class="fw-bold mb-0">Daftar Kategori</h6>
-            <span class="badge bg-light text-dark border">Total: {{ $categories->total() }} Kategori</span>
+    <div class="card">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-0 text-dark">Daftar Kategori</h6>
+            <span class="badge bg-light text-secondary border">Total: {{ $categories->total() }} Kategori</span>
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead>
                     <tr>
                         <th style="width: 60px;">#</th>
                         <th>Nama Kategori</th>
@@ -64,12 +64,12 @@
                         <td>{{ $categories->firstItem() + $index }}</td>
                         <td>
                             <div class="fw-semibold text-dark">
-                                <i class="bi bi-folder2-open text-primary me-2"></i>{{ $cat->name }}
+                                <i class="bi bi-folder2 text-secondary me-2"></i>{{ $cat->name }}
                             </div>
                         </td>
                         <td class="text-center">
                             @if($cat->products_count > 0)
-                                <a href="{{ route('products.index', ['category_id' => $cat->id]) }}" class="badge bg-primary text-decoration-none px-2 py-1">
+                                <a href="{{ route('products.index', ['category_id' => $cat->id]) }}" class="badge bg-primary-subtle text-primary border border-primary-subtle text-decoration-none px-2 py-1">
                                     {{ $cat->products_count }} Produk
                                 </a>
                             @else
@@ -84,7 +84,7 @@
                                 </a>
 
                                 @if($cat->products_count > 0)
-                                    <button class="btn btn-outline-secondary" onclick="alert('Kategori {{ $cat->name }} tidak dapat dihapus karena masih menampung {{ $cat->products_count }} produk terkait. Sesuai aturan integritas referensial, produk harus dipindahkan atau dihapus terlebih dahulu.')" title="Kategori terkunci karena memiliki produk">
+                                    <button class="btn btn-outline-secondary" onclick="alert('Kategori {{ $cat->name }} tidak dapat dihapus karena masih digunakan oleh {{ $cat->products_count }} produk aktif. Silakan pindahkan atau hapus produk di dalam kategori ini terlebih dahulu.')" title="Terkunci karena memiliki produk">
                                         <i class="bi bi-lock-fill text-muted"></i>
                                     </button>
                                 @else

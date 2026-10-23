@@ -7,167 +7,168 @@
     <!-- Header Welcome -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">Dashboard Ikhtisar Operasional</h3>
-            <p class="text-muted mb-0">
-                Selamat datang kembali, <strong>{{ auth()->user()->name }}</strong>! Anda masuk dengan peran 
-                <span class="badge {{ auth()->user()->isAdmin() ? 'badge-role-admin' : 'badge-role-staff' }}">{{ strtoupper(auth()->user()->role) }}</span>.
+            <h4 class="fw-bold text-dark mb-1">Ikhtisar Operasional Bisnis</h4>
+            <p class="text-muted mb-0 small">
+                Ringkasan performa penjualan harian, pengadaan inventaris, dan status ketersediaan barang di gudang.
             </p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('sales.create') }}" class="btn btn-success shadow-sm">
-                <i class="bi bi-cart-check me-1"></i> Transaksi Penjualan
+            <a href="{{ route('sales.create') }}" class="btn btn-success shadow-sm btn-sm px-3">
+                <i class="bi bi-cart-check me-1"></i> + Penjualan Baru
             </a>
-            <a href="{{ route('purchases.create') }}" class="btn btn-warning text-dark fw-semibold shadow-sm">
-                <i class="bi bi-cart-plus me-1"></i> Transaksi Pembelian
+            <a href="{{ route('purchases.create') }}" class="btn btn-primary shadow-sm btn-sm px-3">
+                <i class="bi bi-arrow-down-left-square me-1"></i> + Pembelian Stok
             </a>
         </div>
     </div>
 
-    <!-- Ringkasan Agregat Angka Nyata Database (Cards) -->
+    <!-- KPI Cards -->
     <div class="row g-3 mb-4">
         <!-- Penjualan Hari Ini -->
         <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-3 bg-success bg-opacity-10 text-success p-3 me-3">
-                        <i class="bi bi-cash-coin fs-2"></i>
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center p-3">
+                    <div class="rounded-3 bg-success-subtle text-success p-3 me-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                        <i class="bi bi-cash-stack fs-3"></i>
                     </div>
                     <div>
-                        <div class="text-muted small fw-medium">Penjualan Hari Ini</div>
-                        <h4 class="fw-bold text-success mb-0">Rp {{ number_format($todaySalesTotal, 0, ',', '.') }}</h4>
-                        <small class="text-muted">{{ $todaySalesCount }} Transaksi Sukses</small>
+                        <div class="text-secondary small fw-medium">Penjualan Hari Ini</div>
+                        <h5 class="fw-bold text-dark mb-0">Rp {{ number_format($todaySalesTotal, 0, ',', '.') }}</h5>
+                        <small class="text-muted" style="font-size: 0.75rem;">{{ $todaySalesCount }} Transaksi Berhasil</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Penjualan Bulan Ini -->
+        <!-- Omzet Bulan Ini -->
         <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-3 bg-primary bg-opacity-10 text-primary p-3 me-3">
-                        <i class="bi bi-graph-up-arrow fs-2"></i>
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center p-3">
+                    <div class="rounded-3 bg-primary-subtle text-primary p-3 me-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                        <i class="bi bi-graph-up-arrow fs-3"></i>
                     </div>
                     <div>
-                        <div class="text-muted small fw-medium">Omzet Penjualan ({{ now()->translatedFormat('F Y') }})</div>
-                        <h4 class="fw-bold text-primary mb-0">Rp {{ number_format($thisMonthSalesTotal, 0, ',', '.') }}</h4>
-                        <small class="text-muted">Total Pembayaran Diterima</small>
+                        <div class="text-secondary small fw-medium">Omzet Bulan Ini</div>
+                        <h5 class="fw-bold text-primary mb-0">Rp {{ number_format($thisMonthSalesTotal, 0, ',', '.') }}</h5>
+                        <small class="text-muted" style="font-size: 0.75rem;">Periode {{ now()->translatedFormat('F Y') }}</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Pembelian Bulan Ini -->
+        <!-- Pengadaan Bulan Ini -->
         <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-3 bg-warning bg-opacity-10 text-warning p-3 me-3">
-                        <i class="bi bi-truck fs-2"></i>
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center p-3">
+                    <div class="rounded-3 bg-warning-subtle text-warning-emphasis p-3 me-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                        <i class="bi bi-truck fs-3"></i>
                     </div>
                     <div>
-                        <div class="text-muted small fw-medium">Pengadaan Stok ({{ now()->translatedFormat('F Y') }})</div>
-                        <h4 class="fw-bold text-dark mb-0">Rp {{ number_format($thisMonthPurchasesTotal, 0, ',', '.') }}</h4>
-                        <small class="text-muted">Total Pembelian ke Supplier</small>
+                        <div class="text-secondary small fw-medium">Pengadaan Stok (Bulan Ini)</div>
+                        <h5 class="fw-bold text-dark mb-0">Rp {{ number_format($thisMonthPurchasesTotal, 0, ',', '.') }}</h5>
+                        <small class="text-muted" style="font-size: 0.75rem;">Total Pembelian Supplier</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Total Katalog & Kategori -->
+        <!-- Total Katalog Produk -->
         <div class="col-sm-6 col-xl-3">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="rounded-3 bg-info bg-opacity-10 text-info p-3 me-3">
-                        <i class="bi bi-boxes fs-2"></i>
+            <div class="card h-100">
+                <div class="card-body d-flex align-items-center p-3">
+                    <div class="rounded-3 bg-info-subtle text-info-emphasis p-3 me-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                        <i class="bi bi-boxes fs-3"></i>
                     </div>
                     <div>
-                        <div class="text-muted small fw-medium">Inventaris Produk</div>
-                        <h4 class="fw-bold text-dark mb-0">{{ $totalProducts }} Produk</h4>
-                        <small class="text-muted">Dalam {{ $totalCategories }} Kategori</small>
+                        <div class="text-secondary small fw-medium">Total Item Produk</div>
+                        <h5 class="fw-bold text-dark mb-0">{{ $totalProducts }} Produk</h5>
+                        <small class="text-muted" style="font-size: 0.75rem;">Terbagi dalam {{ $totalCategories }} Kategori</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Alert Banner Stok Kritis -->
+    <!-- Peringatan Stok Menipis (Hanya tampil jika ada stok kritis) -->
     @if($lowStockCount > 0)
-    <div class="card border-0 shadow-sm rounded-3 mb-4 border-start border-danger border-4">
-        <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center">
-                    <i class="bi bi-exclamation-triangle-fill text-danger fs-3 me-3"></i>
-                    <div>
-                        <h5 class="fw-bold text-danger mb-0">Peringatan Kritis: Produk Stok Menipis</h5>
-                        <p class="text-muted small mb-0">Terdapat <strong>{{ $lowStockCount }} produk</strong> dengan kuantitas stok &le; batas minimum pengamanan.</p>
-                    </div>
-                </div>
-                <a href="{{ route('products.low-stock') }}" class="btn btn-danger btn-sm px-3">
+    <div class="card mb-4 border-danger-subtle">
+        <div class="card-header bg-danger-subtle py-3 d-flex justify-content-between align-items-center border-bottom border-danger-subtle">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill text-danger fs-5 me-2"></i>
+                <h6 class="fw-bold text-danger mb-0">Peringatan: Stok Barang Menipis (Perlu Pengadaan Ulang)</h6>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('purchases.create') }}" class="btn btn-danger btn-sm">
+                    <i class="bi bi-cart-plus me-1"></i> Buat Pesanan Beli (Restock)
+                </a>
+                <a href="{{ route('products.low-stock') }}" class="btn btn-outline-danger btn-sm">
                     Lihat Semua ({{ $lowStockCount }})
                 </a>
             </div>
-
-            <div class="table-responsive">
-                <table class="table table-sm table-hover align-middle mb-0">
-                    <thead class="table-light small">
-                        <tr>
-                            <th>SKU</th>
-                            <th>Nama Produk</th>
-                            <th>Kategori</th>
-                            <th class="text-center">Sisa Stok</th>
-                            <th class="text-center">Batas Minimum</th>
-                            <th class="text-end">Harga Beli Standar</th>
-                            <th class="text-center" style="width: 120px;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="small">
-                        @foreach($lowStockProducts as $lp)
-                        <tr class="table-danger-subtle">
-                            <td><code>{{ $lp->sku }}</code></td>
-                            <td class="fw-bold text-dark">{{ $lp->name }}</td>
-                            <td><span class="badge bg-light text-dark border">{{ $lp->category->name }}</span></td>
-                            <td class="text-center">
-                                <span class="badge bg-danger fs-6 px-2 py-1">{{ $lp->stock }}</span>
-                            </td>
-                            <td class="text-center text-muted fw-semibold">{{ $lp->minimum_stock }}</td>
-                            <td class="text-end text-muted">Rp {{ number_format($lp->purchase_price, 0, ',', '.') }}</td>
-                            <td class="text-center">
-                                <a href="{{ route('products.show', $lp) }}" class="btn btn-sm btn-outline-primary" title="Lihat Detail">
-                                    <i class="bi bi-eye"></i> Detail
-                                </a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Kode SKU</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th class="text-center">Sisa Stok</th>
+                        <th class="text-center">Batas Minimum</th>
+                        <th class="text-end">Harga Beli Standar</th>
+                        <th class="text-center" style="width: 140px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($lowStockProducts as $lp)
+                    <tr>
+                        <td><code>{{ $lp->sku }}</code></td>
+                        <td class="fw-semibold text-dark">{{ $lp->name }}</td>
+                        <td><span class="badge bg-light text-secondary border">{{ $lp->category->name }}</span></td>
+                        <td class="text-center">
+                            <span class="badge bg-danger-subtle text-danger fs-6 px-2 py-1">{{ $lp->stock }} Unit</span>
+                        </td>
+                        <td class="text-center text-muted fw-semibold">{{ $lp->minimum_stock }} Unit</td>
+                        <td class="text-end text-muted">Rp {{ number_format($lp->purchase_price, 0, ',', '.') }}</td>
+                        <td class="text-center">
+                            <a href="{{ route('products.show', $lp) }}" class="btn btn-sm btn-outline-secondary" title="Lihat Rincian">
+                                <i class="bi bi-eye"></i> Detail
+                            </a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
     @endif
 
-    <!-- 5 Transaksi Penjualan Terakhir & Info Sistem -->
+    <!-- 5 Transaksi Terakhir & Akses Operasional Cepat -->
     <div class="row g-4">
-        <!-- 5 Transaksi Terakhir -->
+        <!-- Tabel Transaksi Penjualan Terakhir -->
         <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold mb-0 text-dark">
-                        <i class="bi bi-clock-history me-1 text-primary"></i> 5 Transaksi Penjualan Terakhir
-                    </h6>
-                    <a href="{{ route('sales.index') }}" class="small text-decoration-none">Lihat Semua Riwayat &rarr;</a>
+            <div class="card h-100">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-clock-history me-2 text-primary"></i>
+                        <h6 class="fw-bold mb-0 text-dark">5 Transaksi Penjualan Terakhir</h6>
+                    </div>
+                    <a href="{{ route('sales.index') }}" class="small text-decoration-none fw-semibold">
+                        Lihat Seluruh Riwayat &rarr;
+                    </a>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light small">
+                        <thead>
                             <tr>
                                 <th>No. Faktur</th>
-                                <th>Kasir / Petugas</th>
+                                <th>Kasir</th>
                                 <th class="text-end">Total Pembayaran</th>
                                 <th class="text-center">Status</th>
                                 <th>Waktu</th>
                             </tr>
                         </thead>
-                        <tbody class="small">
+                        <tbody>
                             @forelse($recentSales as $sale)
                             <tr>
                                 <td>
@@ -175,22 +176,24 @@
                                         <code>{{ $sale->sale_number }}</code>
                                     </a>
                                 </td>
-                                <td>{{ $sale->user->name }}</td>
-                                <td class="text-end fw-bold text-success">
+                                <td>
+                                    <span class="fw-semibold text-dark">{{ $sale->user->name }}</span>
+                                </td>
+                                <td class="text-end fw-bold text-dark">
                                     Rp {{ number_format($sale->total, 0, ',', '.') }}
                                 </td>
                                 <td class="text-center">
                                     @if($sale->status === 'completed')
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Completed</span>
+                                        <span class="badge bg-success-subtle text-success">Selesai</span>
                                     @else
-                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Cancelled</span>
+                                        <span class="badge bg-danger-subtle text-danger">Dibatalkan</span>
                                     @endif
                                 </td>
-                                <td class="text-muted">{{ $sale->sold_at->diffForHumans() }}</td>
+                                <td class="text-muted small">{{ $sale->sold_at->diffForHumans() }}</td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">Belum ada transaksi penjualan tercatat.</td>
+                                <td colspan="5" class="text-center py-4 text-muted">Belum ada transaksi penjualan yang tercatat.</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -199,26 +202,57 @@
             </div>
         </div>
 
-        <!-- Info Otorisasi & Integritas Sistem -->
+        <!-- Menu Akses Cepat Operasional (Business Oriented) -->
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-header bg-white py-3">
-                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-shield-check me-1 text-success"></i> Integritas Sistem & Otorisasi</h6>
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-lightning-charge me-1 text-warning"></i> Menu Akses Cepat
+                    </h6>
                 </div>
                 <div class="card-body p-3">
-                    <div class="p-2 mb-2 bg-light rounded-2 border small">
-                        <div class="fw-bold text-dark"><i class="bi bi-cpu text-primary me-1"></i> Laravel 12 Engine</div>
-                        <div class="text-muted">Middleware alias terdaftar di <code>bootstrap/app.php</code> via <code>withMiddleware()</code>.</div>
-                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{{ route('sales.create') }}" class="btn btn-outline-success text-start py-2 d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="bi bi-cart-plus me-2 fs-5 align-middle"></i>
+                                <span class="fw-semibold">Kasir Penjualan Baru</span>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
 
-                    <div class="p-2 mb-2 bg-light rounded-2 border small">
-                        <div class="fw-bold text-dark"><i class="bi bi-lock-fill text-warning me-1"></i> Pessimistic Locking</div>
-                        <div class="text-muted">Mencegah *race condition* dengan <code>Product::lockForUpdate()</code> dalam <code>DB::transaction()</code>.</div>
-                    </div>
+                        <a href="{{ route('purchases.create') }}" class="btn btn-outline-primary text-start py-2 d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="bi bi-truck me-2 fs-5 align-middle"></i>
+                                <span class="fw-semibold">Faktur Pembelian Baru</span>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
 
-                    <div class="p-2 bg-light rounded-2 border small">
-                        <div class="fw-bold text-dark"><i class="bi bi-arrow-repeat text-success me-1"></i> Atomisitas Mutasi</div>
-                        <div class="text-muted">Jika stok kurang, seluruh transaksi otomatis di-rollback tanpa menyimpan data header.</div>
+                        @if(auth()->user()->isAdmin())
+                        <a href="{{ route('products.create') }}" class="btn btn-outline-secondary text-start py-2 d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="bi bi-plus-circle me-2 fs-5 align-middle"></i>
+                                <span class="fw-semibold">Registrasi Produk Baru</span>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted"></i>
+                        </a>
+                        @endif
+
+                        <a href="{{ route('products.index') }}" class="btn btn-light border text-start py-2 d-flex align-items-center justify-content-between mt-1">
+                            <div>
+                                <i class="bi bi-boxes me-2 text-secondary"></i>
+                                <span>Katalog Inventaris Lengkap</span>
+                            </div>
+                            <span class="badge bg-secondary rounded-pill">{{ $totalProducts }}</span>
+                        </a>
+
+                        <a href="{{ route('products.low-stock') }}" class="btn btn-light border text-start py-2 d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="bi bi-exclamation-triangle me-2 text-danger"></i>
+                                <span>Daftar Stok Menipis</span>
+                            </div>
+                            <span class="badge bg-danger rounded-pill">{{ $lowStockCount }}</span>
+                        </a>
                     </div>
                 </div>
             </div>
