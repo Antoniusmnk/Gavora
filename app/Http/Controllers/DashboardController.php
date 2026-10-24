@@ -28,6 +28,8 @@ class DashboardController extends Controller
             ->whereDate('sold_at', today())
             ->count();
 
+        $totalTransactions = Sale::where('status', 'completed')->count();
+
         // 3. Metrik Penjualan Bulan Ini
         $thisMonthSalesTotal = Sale::where('status', 'completed')
             ->whereMonth('sold_at', now()->month)
@@ -59,6 +61,7 @@ class DashboardController extends Controller
             'totalCategories',
             'todaySalesTotal',
             'todaySalesCount',
+            'totalTransactions',
             'thisMonthSalesTotal',
             'thisMonthPurchasesTotal',
             'lowStockCount',

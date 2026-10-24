@@ -50,7 +50,7 @@
                     <div>
                         <div class="text-secondary small fw-medium">Omzet Bulan Ini</div>
                         <h5 class="fw-bold text-primary mb-0">Rp {{ number_format($thisMonthSalesTotal, 0, ',', '.') }}</h5>
-                        <small class="text-muted" style="font-size: 0.75rem;">Periode {{ now()->translatedFormat('F Y') }}</small>
+                        <small class="text-muted" style="font-size: 0.75rem;">Total {{ $totalTransactions }} Transaksi ({{ now()->translatedFormat('M Y') }})</small>
                     </div>
                 </div>
             </div>

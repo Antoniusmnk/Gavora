@@ -567,6 +567,7 @@ class InventorySalesTest extends TestCase
             'totalCategories',
             'todaySalesTotal',
             'todaySalesCount',
+            'totalTransactions',
             'thisMonthSalesTotal',
             'thisMonthPurchasesTotal',
             'lowStockCount',
