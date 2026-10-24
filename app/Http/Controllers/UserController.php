@@ -74,6 +74,14 @@ class UserController extends Controller
     }
 
     /**
+     * Tampilkan detail user (dialihkan ke halaman edit user).
+     */
+    public function show(User $user): RedirectResponse
+    {
+        return redirect()->route('users.edit', $user);
+    }
+
+    /**
      * Tampilkan form edit user.
      */
     public function edit(User $user): View

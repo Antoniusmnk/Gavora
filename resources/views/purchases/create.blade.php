@@ -56,6 +56,11 @@
                 </div>
 
                 <!-- Tabel Item Barang Masuk -->
+                @error('items')
+                    <div class="alert alert-danger border-0 small mb-3">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ $message }}
+                    </div>
+                @enderror
                 <div class="card">
                     <div class="card-header py-3 d-flex justify-content-between align-items-center">
                         <div>
@@ -131,7 +136,8 @@
 <!-- Template Produk untuk JavaScript -->
 <script>
     const availableProducts = @json($products);
-    const oldItems = @json(old('items', []));
+    const rawOldItems = @json(old('items', []));
+    const oldItems = Array.isArray(rawOldItems) ? rawOldItems : Object.values(rawOldItems || {});
 
     let rowIndex = 0;
 
@@ -243,7 +249,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('addRowBtn').addEventListener('click', () => createRow());
 
-        if (Array.isArray(oldItems) && oldItems.length > 0) {
+        if (oldItems.length > 0) {
             oldItems.forEach(item => createRow(item));
         } else {
             createRow();

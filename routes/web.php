@@ -46,8 +46,8 @@ Route::middleware('auth')->group(function () {
 
     // Khusus Role Admin (Server-Side Authorization via RoleMiddleware)
     Route::middleware('role:admin')->group(function () {
-        // Manajemen Pengguna (Users)
-        Route::resource('users', UserController::class);
+        // Manajemen Pengguna (Users - Kecuali Show)
+        Route::resource('users', UserController::class)->except(['show']);
 
         // Master Data Categories & Suppliers (Kecuali Show)
         Route::resource('categories', CategoryController::class)->except(['show']);
@@ -57,7 +57,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
-        Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::match(['put', 'patch'], '/products/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
         // Pembatalan Transaksi Khusus Admin (Mendukung PATCH dan POST)

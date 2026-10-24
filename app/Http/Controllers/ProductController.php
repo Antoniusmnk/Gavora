@@ -76,6 +76,8 @@ class ProductController extends Controller
      */
     public function create(): View
     {
+        $this->authorizeAdmin();
+
         $categories = Category::orderBy('name')->get();
         return view('products.create', compact('categories'));
     }
@@ -85,6 +87,8 @@ class ProductController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $this->authorizeAdmin();
+
         $validated = $request->validate([
             'sku' => ['required', 'string', 'max:50', 'unique:products,sku'],
             'name' => ['required', 'string', 'max:150'],
@@ -120,6 +124,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product): View
     {
+        $this->authorizeAdmin();
+
         $categories = Category::orderBy('name')->get();
         return view('products.edit', compact('product', 'categories'));
     }
@@ -131,6 +137,8 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product): RedirectResponse
     {
+        $this->authorizeAdmin();
+
         $validated = $request->validate([
             'sku' => ['required', 'string', 'max:50', Rule::unique('products', 'sku')->ignore($product->id)],
             'name' => ['required', 'string', 'max:150'],
@@ -167,6 +175,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product): RedirectResponse
     {
+        $this->authorizeAdmin();
+
         // Proteksi: Cek apakah produk pernah digunakan dalam transaksi
         if ($product->hasTransactions()) {
             return back()->with('error', 'Produk tidak dapat dihapus karena sudah tercatat dalam riwayat transaksi pembelian atau penjualan.');
@@ -176,5 +186,15 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('products.index')->with('success', 'Produk "' . $name . '" berhasil dihapus dari sistem.');
+    }
+
+    /**
+     * Helper server-side authorization: Pastikan hanya Admin yang dapat mengeksekusi mutasi master produk.
+     */
+    private function authorizeAdmin(): void
+    {
+        if (!auth()->user()?->isAdmin()) {
+            abort(403, 'Akses ditolak: Hanya Admin yang berhak mengelola master data produk.');
+        }
     }
 }

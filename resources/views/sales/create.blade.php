@@ -45,6 +45,11 @@
                 </div>
 
                 <!-- Keranjang Item Produk -->
+                @error('items')
+                    <div class="alert alert-danger border-0 small mb-3">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ $message }}
+                    </div>
+                @enderror
                 <div class="card">
                     <div class="card-header py-3 d-flex justify-content-between align-items-center">
                         <div>
@@ -120,7 +125,8 @@
 <!-- Template & Skrip Dinamis Vanilla JS -->
 <script>
     const availableProducts = @json($products);
-    const oldItems = @json(old('items', []));
+    const rawOldItems = @json(old('items', []));
+    const oldItems = Array.isArray(rawOldItems) ? rawOldItems : Object.values(rawOldItems || {});
 
     let rowIndex = 0;
 
@@ -136,8 +142,8 @@
         availableProducts.forEach(prod => {
             const isSelected = selectedProductId == prod.id ? 'selected' : '';
             const isOutOfStock = prod.stock <= 0;
-            productOptions += `<option value="${prod.id}" data-price="${prod.selling_price}" data-stock="${prod.stock}" ${isSelected} ${isOutOfStock ? 'class="text-danger"' : ''}>
-                [${prod.sku}] ${prod.name} (Stok: ${prod.stock} unit) - Rp ${Number(prod.selling_price).toLocaleString('id-ID')}
+            productOptions += `<option value="${prod.id}" data-price="${prod.selling_price}" data-stock="${prod.stock}" ${isSelected} ${isOutOfStock ? 'disabled class="text-danger bg-light"' : ''}>
+                [${prod.sku}] ${prod.name} ${isOutOfStock ? '(STOK HABIS - 0 Unit)' : `(Stok: ${prod.stock} unit)`} - Rp ${Number(prod.selling_price).toLocaleString('id-ID')}
             </option>`;
         });
 
@@ -189,18 +195,36 @@
 
         if (selectElement.value) {
             priceDisplay.innerText = 'Rp ' + price.toLocaleString('id-ID');
-            qtyInput.setAttribute('max', stock);
 
             if (stock <= 0) {
-                stockHint.innerHTML = `<span class="badge bg-danger-subtle text-danger">Stok Habis</span>`;
-            } else if (stock <= 5) {
-                stockHint.innerHTML = `<span class="badge bg-warning-subtle text-warning-emphasis">Sisa Stok Terbatas: ${stock} Unit</span>`;
+                qtyInput.value = 0;
+                qtyInput.disabled = true;
+                qtyInput.setAttribute('max', 0);
+                stockHint.innerHTML = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle"><i class="bi bi-x-circle me-1"></i>Stok Habis (0 Unit) - Tidak Dapat Dijual</span>`;
             } else {
-                stockHint.innerHTML = `<span class="badge bg-success-subtle text-success">Stok Tersedia: ${stock} Unit</span>`;
+                qtyInput.disabled = false;
+                qtyInput.setAttribute('min', 1);
+                qtyInput.setAttribute('max', stock);
+
+                let currentQty = parseInt(qtyInput.value) || 0;
+                if (currentQty <= 0) {
+                    qtyInput.value = 1;
+                } else if (currentQty > stock) {
+                    qtyInput.value = stock;
+                }
+
+                if (stock <= 5) {
+                    stockHint.innerHTML = `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="bi bi-exclamation-triangle me-1"></i>Sisa Stok Terbatas: ${stock} Unit</span>`;
+                } else {
+                    stockHint.innerHTML = `<span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check2-circle me-1"></i>Stok Tersedia: ${stock} Unit</span>`;
+                }
             }
         } else {
             priceDisplay.innerText = 'Rp 0';
             stockHint.innerText = 'Pilih produk untuk melihat sisa stok gudang.';
+            qtyInput.disabled = false;
+            qtyInput.setAttribute('min', 1);
+            qtyInput.removeAttribute('max');
         }
 
         calculateSubtotal(index);
@@ -213,9 +237,16 @@
         const select = row.querySelector('.product-select');
         const selectedOption = select.options[select.selectedIndex];
         const price = parseFloat(selectedOption?.getAttribute('data-price')) || 0;
-        const qty = parseInt(row.querySelector('.quantity-input').value) || 0;
+        const stock = parseInt(selectedOption?.getAttribute('data-stock')) || 0;
+        const qtyInput = row.querySelector('.quantity-input');
+        let qty = parseInt(qtyInput.value) || 0;
 
-        const subtotal = price * qty;
+        if (stock > 0 && qty > stock) {
+            qty = stock;
+            qtyInput.value = stock;
+        }
+
+        const subtotal = (stock > 0 && qty > 0) ? (price * qty) : 0;
         const display = document.getElementById(`subtotal-${index}`);
         if (display) {
             display.innerText = 'Rp ' + subtotal.toLocaleString('id-ID');
@@ -261,11 +292,50 @@
     document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('addRowBtn').addEventListener('click', () => createRow());
 
-        if (Array.isArray(oldItems) && oldItems.length > 0) {
+        if (oldItems.length > 0) {
             oldItems.forEach(item => createRow(item));
         } else {
             createRow();
         }
+
+        // Validasi Sisi Klien Sebelum Formulir Dikirimkan
+        document.getElementById('saleForm').addEventListener('submit', function (e) {
+            const rows = document.querySelectorAll('#itemsTableBody tr');
+            if (rows.length === 0) {
+                e.preventDefault();
+                alert('Pilih minimal satu item barang untuk transaksi penjualan.');
+                return;
+            }
+
+            for (const row of rows) {
+                const select = row.querySelector('.product-select');
+                const selectedOption = select?.options[select.selectedIndex];
+                const stock = parseInt(selectedOption?.getAttribute('data-stock')) || 0;
+                const qtyInput = row.querySelector('.quantity-input');
+                const qty = parseInt(qtyInput?.value) || 0;
+
+                if (!select.value) {
+                    e.preventDefault();
+                    alert('Pastikan semua baris barang telah memilih produk.');
+                    select.focus();
+                    return;
+                }
+
+                if (stock <= 0) {
+                    e.preventDefault();
+                    alert(`Produk "${selectedOption.text.trim()}" sedang kehabisan stok (0 unit) dan tidak dapat dijual.`);
+                    select.focus();
+                    return;
+                }
+
+                if (qty <= 0 || qty > stock) {
+                    e.preventDefault();
+                    alert(`Kuantitas untuk "${selectedOption.text.trim()}" harus antara 1 dan ${stock} unit.`);
+                    qtyInput.focus();
+                    return;
+                }
+            }
+        });
     });
 </script>
 @endsection
