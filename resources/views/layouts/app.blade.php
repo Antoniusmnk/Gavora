@@ -29,11 +29,31 @@
         }
         .sidebar {
             width: var(--sidebar-width);
-            min-height: 100vh;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            flex-shrink: 0;
             background-color: #0f172a;
             color: #94a3b8;
             transition: all 0.2s ease-in-out;
             border-right: 1px solid #1e293b;
+            z-index: 1000;
+            scrollbar-width: thin;
+            scrollbar-color: #334155 transparent;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #475569;
         }
         .sidebar .nav-link {
             color: #94a3b8;
@@ -71,11 +91,15 @@
         }
         .content-wrapper {
             flex-grow: 1;
+            min-width: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
         .top-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
             background-color: #ffffff;
             border-bottom: 1px solid #e2e8f0;
             padding: 0.875rem 1.75rem;
@@ -114,13 +138,32 @@
         }
         .sticky-summary {
             position: sticky;
-            top: 1.5rem;
+            top: 5rem;
+        }
+        @media (max-width: 991.98px) {
+            .app-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid #1e293b;
+            }
+            .top-navbar {
+                position: sticky;
+                top: 0;
+            }
+            .sticky-summary {
+                position: static;
+            }
         }
     </style>
     @stack('styles')
 </head>
 <body>
-<div class="d-flex">
+<div class="d-flex app-layout">
     <!-- Sidebar Navigasi Perusahaan -->
     <nav class="sidebar d-flex flex-column p-3 flex-shrink-0">
         <a href="{{ route('dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none px-2">
