@@ -105,7 +105,7 @@ class SaleController extends Controller
                     ]);
                 }
 
-                // Ambil harga jual RESMI dari database server, BUKAN dari input browser pengguna!
+                // Ambil harga jual RESMI dari database server, BUKAN dari input browser pengguna
                 $unitPrice = (float) $product->selling_price;
                 $subtotal = $unitPrice * $qty;
 
