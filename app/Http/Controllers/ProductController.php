@@ -132,7 +132,7 @@ class ProductController extends Controller
 
     /**
      * Perbarui data master produk (Khusus Admin).
-     * CATATAN KRITIS: Field 'stock' TIDAK DIPERBOLEHKAN diubah secara manual lewat form edit ini
+     * CATATAN: Field 'stock' TIDAK DIPERBOLEHKAN diubah secara manual lewat form edit ini
      * untuk menjaga integritas mutasi stok murni dari transaksi pembelian dan penjualan!
      */
     public function update(Request $request, Product $product): RedirectResponse
