@@ -66,6 +66,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Helper to verify if user has customer role.
+     */
+    public function isCustomer(): bool
+    {
+        return $this->role === 'customer' || $this->role === 'user';
+    }
+
+    /**
      * Relasi ke tabel purchases.
      */
     public function purchases(): HasMany

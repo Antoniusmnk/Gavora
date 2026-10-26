@@ -15,7 +15,9 @@ class AuthController extends Controller
     public function showLogin(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            return Auth::user()->isCustomer()
+                ? redirect()->route('products.index')
+                : redirect()->route('dashboard');
         }
 
         return view('auth.login');
@@ -38,13 +40,36 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard'))
+            $redirectRoute = Auth::user()->isCustomer() ? route('products.index') : route('dashboard');
+
+            return redirect()->intended($redirectRoute)
                 ->with('success', 'Selamat datang, ' . Auth::user()->name . ' (' . ucfirst(Auth::user()->role) . ')!');
         }
 
         return back()
             ->withErrors(['email' => 'Kombinasi email dan password tidak sesuai.'])
             ->onlyInput('email');
+    }
+
+    /**
+     * Login instan 1-klik sebagai Customer (tanpa input sandi).
+     */
+    public function loginAsCustomer(Request $request): RedirectResponse
+    {
+        $customer = \App\Models\User::firstOrCreate(
+            ['email' => 'customer@gavora.test'],
+            [
+                'name' => 'Pelanggan / Customer',
+                'password' => \Illuminate\Support\Facades\Hash::make('customer123'),
+                'role' => 'customer',
+            ]
+        );
+
+        Auth::login($customer);
+        $request->session()->regenerate();
+
+        return redirect()->route('products.index')
+            ->with('success', 'Selamat datang di Katalog Produk Gavora! Anda masuk dengan akses Customer.');
     }
 
     /**

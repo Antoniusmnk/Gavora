@@ -136,6 +136,11 @@
             color: #2563eb;
             border: 1px solid #bfdbfe;
         }
+        .badge-role-customer {
+            background-color: #dcfce7;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
         .sticky-summary {
             position: sticky;
             top: 5rem;
@@ -166,32 +171,38 @@
 <div class="d-flex app-layout">
     <!-- Sidebar Navigasi Perusahaan -->
     <nav class="sidebar d-flex flex-column p-3 flex-shrink-0">
-        <a href="{{ route('dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none px-2">
+        <a href="{{ auth()->user()->isCustomer() ? route('products.index') : route('dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none px-2">
             <div class="bg-primary text-white rounded-3 p-2 me-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                 <i class="bi bi-box-seam fs-5"></i>
             </div>
             <div>
                 <span class="fs-5 fw-bold text-white tracking-tight">GAVORA</span>
-                <span class="d-block text-secondary text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.1em;">Enterprise ERP</span>
+                <span class="d-block text-secondary text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.1em;">
+                    {{ auth()->user()->isCustomer() ? 'Katalog Pelanggan' : 'Enterprise ERP' }}
+                </span>
             </div>
         </a>
         <hr class="border-secondary border-opacity-25 my-3">
 
         <ul class="nav nav-pills flex-column mb-auto">
+            @if(!auth()->user()->isCustomer())
             <li class="nav-item">
                 <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <i class="bi bi-grid-1x2"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
+            @endif
 
-            <div class="sidebar-heading">Katalog & Inventaris</div>
+            <div class="sidebar-heading">{{ auth()->user()->isCustomer() ? 'Menu Pelanggan' : 'Katalog & Inventaris' }}</div>
             <li>
                 <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.index') || request()->routeIs('products.show') ? 'active' : '' }}">
                     <i class="bi bi-boxes"></i>
-                    <span>Katalog Produk</span>
+                    <span>{{ auth()->user()->isCustomer() ? 'Katalog Produk' : 'Katalog Produk' }}</span>
                 </a>
             </li>
+
+            @if(!auth()->user()->isCustomer())
             <li>
                 <a href="{{ route('products.low-stock') }}" class="nav-link {{ request()->routeIs('products.low-stock') ? 'active' : '' }}">
                     <i class="bi bi-exclamation-triangle"></i>
@@ -202,6 +213,7 @@
                     @endif
                 </a>
             </li>
+            @endif
 
             @if(auth()->user()->isAdmin())
             <li>
@@ -218,6 +230,7 @@
             </li>
             @endif
 
+            @if(!auth()->user()->isCustomer())
             <div class="sidebar-heading">Transaksi Operasional</div>
             <li>
                 <a href="{{ route('purchases.index') }}" class="nav-link {{ request()->routeIs('purchases*') ? 'active' : '' }}">
@@ -231,6 +244,7 @@
                     <span>Penjualan (Kasir)</span>
                 </a>
             </li>
+            @endif
 
             @if(auth()->user()->isAdmin())
             <div class="sidebar-heading">Administrasi</div>
@@ -246,7 +260,9 @@
         <hr class="border-secondary border-opacity-25 my-3">
         <div class="px-2 d-flex align-items-center justify-content-between">
             <span class="small text-secondary">Aplikasi Versi 1.0</span>
-            <span class="badge bg-secondary-subtle text-light-emphasis small">ERP Online</span>
+            <span class="badge bg-secondary-subtle text-light-emphasis small">
+                {{ auth()->user()->isCustomer() ? 'Akses Pelanggan' : 'ERP Online' }}
+            </span>
         </div>
     </nav>
 
@@ -267,7 +283,7 @@
                         </div>
                         <div class="text-start me-1">
                             <div class="fw-semibold small leading-tight text-dark">{{ auth()->user()->name }}</div>
-                            <span class="badge {{ auth()->user()->isAdmin() ? 'badge-role-admin' : 'badge-role-staff' }}" style="font-size: 0.675rem;">
+                            <span class="badge {{ auth()->user()->isAdmin() ? 'badge-role-admin' : (auth()->user()->isCustomer() ? 'badge-role-customer' : 'badge-role-staff') }}" style="font-size: 0.675rem;">
                                 {{ ucfirst(auth()->user()->role) }}
                             </span>
                         </div>

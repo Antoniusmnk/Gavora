@@ -52,7 +52,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6'],
-            'role' => ['required', 'in:admin,staff'],
+            'role' => ['required', 'in:admin,staff,customer'],
         ], [
             'name.required' => 'Nama user wajib diisi.',
             'email.required' => 'Email wajib diisi.',
@@ -98,14 +98,14 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:6'],
-            'role' => ['required', 'in:admin,staff'],
+            'role' => ['required', 'in:admin,staff,customer'],
         ], [
             'name.required' => 'Nama user wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.unique' => 'Email sudah digunakan oleh user lain.',
             'password.min' => 'Password baru minimal terdiri dari 6 karakter.',
             'role.required' => 'Role pengguna wajib dipilih.',
-            'role.in' => 'Role harus admin atau staff.',
+            'role.in' => 'Role harus admin, staff, atau customer.',
         ]);
 
         // Cegah Admin login mengubah rolenya sendiri menjadi staff jika tidak ada admin lain

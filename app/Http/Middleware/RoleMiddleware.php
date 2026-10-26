@@ -25,6 +25,10 @@ class RoleMiddleware
 
         // 2. Cek apakah role user saat ini tercakup dalam role yang diizinkan
         if (!in_array($user->role, $roles)) {
+            if ($user->isCustomer()) {
+                return redirect()->route('products.index')->with('error', 'Akses dibatasi: Halaman tersebut khusus untuk staf internal toko.');
+            }
+
             abort(403, 'Akses ditolak: Anda tidak memiliki izin untuk mengakses halaman atau aksi ini.');
         }
 

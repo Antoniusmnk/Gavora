@@ -10,39 +10,51 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect root ke dashboard jika sudah login, atau ke login jika belum
+// Redirect root ke dashboard jika admin/staff, ke katalog jika customer, atau ke login jika belum login
 Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
+
+    return auth()->user()->isCustomer()
+        ? redirect()->route('products.index')
+        : redirect()->route('dashboard');
 });
 
 // Autentikasi Pengguna (Guest)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/login/customer', [AuthController::class, 'loginAsCustomer'])->name('login.customer');
 });
 
 // Area Terproteksi (Login Diperlukan)
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Dashboard Utama dengan Data Agregat
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Produk (Akses Read-Only untuk Staff & Admin)
+    // Katalog Produk & Rincian (Dapat Diakses Seluruh Role: Admin, Staff, dan Customer)
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/low-stock', [ProductController::class, 'lowStock'])->name('products.low-stock');
 
-    // Transaksi Pembelian (Stock-In) - Diakses Admin & Staff
-    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
-    Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
-    Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
-    Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+    // Fitur Khusus Internal Toko & Operasional Gudang (Role: Admin & Staff)
+    Route::middleware('role:admin,staff')->group(function () {
+        // Dashboard Utama dengan Data Agregat Finansial & Omzet
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Transaksi Penjualan (Stock-Out) - Diakses Admin & Staff
-    Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
-    Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
-    Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
-    Route::get('/sales/{sale}', [SaleController::class, 'show'])->name('sales.show');
+        // Monitoring Stok Menipis Gudang
+        Route::get('/products/low-stock', [ProductController::class, 'lowStock'])->name('products.low-stock');
+
+        // Transaksi Pembelian (Stock-In)
+        Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+        Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
+        Route::post('/purchases', [PurchaseController::class, 'store'])->name('purchases.store');
+        Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+
+        // Transaksi Penjualan (Kasir / Stock-Out)
+        Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+        Route::get('/sales/create', [SaleController::class, 'create'])->name('sales.create');
+        Route::post('/sales', [SaleController::class, 'store'])->name('sales.store');
+        Route::get('/sales/{sale}', [SaleController::class, 'show'])->name('sales.show');
+    });
 
     // Khusus Role Admin (Server-Side Authorization via RoleMiddleware)
     Route::middleware('role:admin')->group(function () {

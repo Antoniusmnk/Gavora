@@ -6,8 +6,10 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="fw-bold text-dark mb-1">Rincian Data Produk</h4>
-            <p class="text-muted mb-0 small">Informasi spesifikasi barang, estimasi margin keuntungan, dan histori mutasi stok fisik.</p>
+            <h4 class="fw-bold text-dark mb-1">{{ auth()->user()->isCustomer() ? 'Rincian Produk' : 'Rincian Data Produk' }}</h4>
+            <p class="text-muted mb-0 small">
+                {{ auth()->user()->isCustomer() ? 'Informasi spesifikasi barang dan status ketersediaan stok fisik.' : 'Informasi spesifikasi barang, estimasi margin keuntungan, dan histori mutasi stok fisik.' }}
+            </p>
         </div>
         <div class="d-flex gap-2">
             <a href="{{ route('products.index') }}" class="btn btn-outline-secondary btn-sm">
@@ -44,6 +46,28 @@
 
                     <hr class="my-3">
 
+                    @if(auth()->user()->isCustomer())
+                    <!-- Tampilan Harga Khusus Customer -->
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded-3 text-center border">
+                                <div class="text-secondary small">Harga Jual Resmi</div>
+                                <div class="fw-bold fs-4 text-primary mt-1">
+                                    Rp {{ number_format($product->selling_price, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded-3 text-center border">
+                                <div class="text-secondary small">Status Transaksi</div>
+                                <div class="fw-semibold fs-6 text-dark mt-1">
+                                    <i class="bi bi-clock-history text-warning me-1"></i> Mode Katalog (Tahap UTS)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @else
+                    <!-- Tampilan Harga Internal untuk Admin & Staff -->
                     <div class="row g-3">
                         <div class="col-sm-4">
                             <div class="p-3 bg-light rounded-3 text-center border">
@@ -75,43 +99,79 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
 
         <!-- Stock Status Card -->
         <div class="col-lg-4">
-            <div class="card h-100 {{ $product->isLowStock() ? 'border-danger-subtle' : '' }}">
+            <div class="card h-100 {{ (!auth()->user()->isCustomer() && $product->isLowStock()) ? 'border-danger-subtle' : '' }}">
                 <div class="card-header py-3">
                     <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-stack me-2 text-primary"></i>Ketersediaan Stok Fisik</h6>
                 </div>
                 <div class="card-body p-4 text-center d-flex flex-column justify-content-center">
-                    <div class="text-secondary small mb-1">Kuantitas di Gudang</div>
-                    <div class="display-6 fw-bold {{ $product->isLowStock() ? 'text-danger' : 'text-success' }} mb-2">
+                    <div class="text-secondary small mb-1">Kuantitas di Toko / Gudang</div>
+                    <div class="display-6 fw-bold {{ $product->stock > 0 ? 'text-success' : 'text-danger' }} mb-2">
                         {{ $product->stock }} <span class="fs-6 text-muted">Unit</span>
                     </div>
 
-                    @if($product->isLowStock())
-                        <div class="alert alert-danger py-2 small mb-3 border-0">
-                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Stok saat ini berada di bawah batas minimum ({{ $product->minimum_stock }} unit). Perlu pengadaan ulang.
+                    @if(auth()->user()->isCustomer())
+                        @if($product->stock > 0)
+                            <div class="alert alert-success py-2 small mb-3 border-0">
+                                <i class="bi bi-check-circle-fill me-1"></i> Stok produk saat ini tersedia di toko.
+                            </div>
+                        @else
+                            <div class="alert alert-danger py-2 small mb-3 border-0">
+                                <i class="bi bi-x-circle-fill me-1"></i> Stok produk saat ini sedang habis.
+                            </div>
+                        @endif
+
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-secondary btn-sm py-2" disabled>
+                                <i class="bi bi-cart-x me-1"></i> Pembayaran Online Belum Aktif
+                            </button>
                         </div>
                     @else
-                        <div class="alert alert-success py-2 small mb-3 border-0">
-                            <i class="bi bi-check-circle-fill me-1"></i> Stok aman (Batas minimum pengamanan: {{ $product->minimum_stock }} unit).
+                        @if($product->isLowStock())
+                            <div class="alert alert-danger py-2 small mb-3 border-0">
+                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Stok saat ini berada di bawah batas minimum ({{ $product->minimum_stock }} unit). Perlu pengadaan ulang.
+                            </div>
+                        @else
+                            <div class="alert alert-success py-2 small mb-3 border-0">
+                                <i class="bi bi-check-circle-fill me-1"></i> Stok aman (Batas minimum pengamanan: {{ $product->minimum_stock }} unit).
+                            </div>
+                        @endif
+
+                        <div class="d-grid gap-2">
+                            <a href="{{ route('purchases.create') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-cart-plus me-1"></i> Buat Pesanan Beli (Restock)
+                            </a>
                         </div>
                     @endif
-
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('purchases.create') }}" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-cart-plus me-1"></i> Buat Pesanan Beli (Restock)
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Transactions Movement Tabs / Cards -->
+    <!-- Area Bawah: Banner UAS untuk Customer VS Tabel Mutasi untuk Admin/Staff -->
+    @if(auth()->user()->isCustomer())
+    <div class="card border-primary-subtle bg-light shadow-sm">
+        <div class="card-body p-4 text-center">
+            <div class="d-inline-flex p-3 rounded-circle bg-primary-subtle text-primary mb-3">
+                <i class="bi bi-credit-card-2-front fs-2"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Informasi Pemesanan & Payment Gateway</h5>
+            <p class="text-muted mx-auto mb-3" style="max-width: 620px;">
+                Saat ini aplikasi berada pada milestone <strong>Ujian Tengah Semester (UTS)</strong> dengan fokus pada manajemen inventaris, katalog produk, dan otorisasi multi-role. Integrasi <strong>Payment Gateway</strong> dan fitur keranjang belanja akan dihadirkan pada <strong>Ujian Akhir Semester (UAS)</strong>.
+            </p>
+            <a href="{{ route('products.index') }}" class="btn btn-outline-primary btn-sm px-4">
+                <i class="bi bi-arrow-left me-1"></i> Kembali ke Katalog Produk
+            </a>
+        </div>
+    </div>
+    @else
+    <!-- Transactions Movement Tabs / Cards (Khusus Admin & Staff) -->
     <div class="row g-4">
         <!-- Riwayat Pembelian (Stock-In) -->
         <div class="col-lg-6">
@@ -197,5 +257,6 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 @endsection

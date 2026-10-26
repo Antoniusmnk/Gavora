@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Gavora Enterprise ERP</title>
+    <title>Masuk - Gavora</title>
 
     <!-- Google Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,11 +30,26 @@
             max-width: 440px;
             width: 100%;
         }
-        .demo-panel {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 1rem;
+
+        .btn-toggle-password {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-left: none;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0.85rem;
+            cursor: pointer;
+            transition: color 0.15s ease-in-out;
+        }
+        .btn-toggle-password:hover,
+        .btn-toggle-password:focus {
+            background-color: #fff;
+            border-color: #dee2e6;
+            color: #0f172a;
+            box-shadow: none;
+            outline: none;
         }
     </style>
 </head>
@@ -46,7 +61,7 @@
             <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 mb-3 shadow-sm" style="width: 52px; height: 52px;">
                 <i class="bi bi-box-seam fs-3"></i>
             </div>
-            <h4 class="fw-bold text-dark mb-1">GAVORA ERP</h4>
+            <h4 class="fw-bold text-dark mb-1">GAVORA</h4>
             <p class="text-muted small">Sistem Manajemen Inventaris & Penjualan</p>
         </div>
 
@@ -86,8 +101,11 @@
                 <div class="input-group">
                     <span class="input-group-text bg-light text-secondary border-end-0"><i class="bi bi-lock"></i></span>
                     <input type="password" name="password" id="password" 
-                           class="form-control border-start-0 ps-0 @error('password') is-invalid @enderror" 
+                           class="form-control border-start-0 border-end-0 ps-0 @error('password') is-invalid @enderror" 
                            placeholder="••••••••" value="password123" required>
+                    <button class="btn btn-toggle-password" type="button" id="togglePassword" title="Lihat kata sandi" aria-label="Lihat kata sandi">
+                        <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                    </button>
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -103,35 +121,41 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm mb-3">
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm mb-0">
                 <i class="bi bi-box-arrow-in-right me-1"></i> Masuk ke Sistem
             </button>
         </form>
 
-        <!-- Panel Akun Pengujian 1-Click Fill -->
-        <div class="demo-panel mt-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="fw-semibold small text-dark"><i class="bi bi-person-check me-1 text-primary"></i> Akun Pengujian:</span>
-                <span class="text-muted" style="font-size: 0.7rem;">Klik untuk isi otomatis</span>
-            </div>
-            <div class="d-grid gap-2">
-                <button type="button" class="btn btn-outline-danger btn-sm text-start d-flex justify-content-between align-items-center" onclick="fillLogin('admin@inventory.test', 'password123')">
-                    <span><i class="bi bi-shield-lock me-1"></i> <strong>Admin</strong> (admin@inventory.test)</span>
-                    <i class="bi bi-arrow-right-short fs-5"></i>
-                </button>
-                <button type="button" class="btn btn-outline-primary btn-sm text-start d-flex justify-content-between align-items-center" onclick="fillLogin('staff1@inventory.test', 'password123')">
-                    <span><i class="bi bi-person-badge me-1"></i> <strong>Staff</strong> (staff1@inventory.test)</span>
-                    <i class="bi bi-arrow-right-short fs-5"></i>
-                </button>
-            </div>
+        <div class="d-flex align-items-center my-3">
+            <hr class="flex-grow-1 text-muted opacity-25">
+            <span class="px-2 text-muted small" style="font-size: 0.75rem;">ATAU</span>
+            <hr class="flex-grow-1 text-muted opacity-25">
         </div>
+
+        <a href="{{ route('login.customer') }}" class="btn btn-outline-success w-100 py-2 fw-semibold d-flex align-items-center justify-content-center shadow-sm">
+            <i class="bi bi-bag-check me-2 fs-5"></i> Masuk sebagai Customer (Tanpa Sandi)
+        </a>
+        <p class="text-center text-muted small mt-2 mb-0" style="font-size: 0.75rem;">
+            Akses langsung untuk melihat katalog produk dan cek stok
+        </p>
     </div>
 </div>
 
 <script>
-    function fillLogin(email, password) {
-        document.getElementById('email').value = email;
-        document.getElementById('password').value = password;
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+    if (togglePasswordBtn && passwordInput && togglePasswordIcon) {
+        togglePasswordBtn.addEventListener('click', function () {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            
+            togglePasswordIcon.classList.toggle('bi-eye', !isPassword);
+            togglePasswordIcon.classList.toggle('bi-eye-slash', isPassword);
+            this.setAttribute('title', isPassword ? 'Sembunyikan kata sandi' : 'Lihat kata sandi');
+            this.setAttribute('aria-label', isPassword ? 'Sembunyikan kata sandi' : 'Lihat kata sandi');
+        });
     }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

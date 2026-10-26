@@ -7,7 +7,7 @@
     <!-- Header Welcome -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h4 class="fw-bold text-dark mb-1">Ikhtisar Operasional Bisnis</h4>
+            <h4 class="fw-bold text-dark mb-1">Operasional Bisnis</h4>
             <p class="text-muted mb-0 small">
                 Ringkasan performa penjualan harian, pengadaan inventaris, dan status ketersediaan barang di gudang.
             </p>
@@ -28,12 +28,12 @@
         <div class="col-sm-6 col-xl-3">
             <div class="card h-100">
                 <div class="card-body d-flex align-items-center p-3">
-                    <div class="rounded-3 bg-success-subtle text-success p-3 me-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <div class="rounded-3 bg-success-subtle text-success flex-shrink-0 me-2 me-xxl-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                         <i class="bi bi-cash-stack fs-3"></i>
                     </div>
                     <div>
                         <div class="text-secondary small fw-medium">Penjualan Hari Ini</div>
-                        <h5 class="fw-bold text-dark mb-0">Rp {{ number_format($todaySalesTotal, 0, ',', '.') }}</h5>
+                        <h5 class="fw-bold text-dark mb-0 text-nowrap" style="font-size: clamp(1.05rem, 1.2vw, 1.25rem);">Rp&nbsp;{{ number_format($todaySalesTotal, 0, ',', '.') }}</h5>
                         <small class="text-muted" style="font-size: 0.75rem;">{{ $todaySalesCount }} Transaksi Berhasil</small>
                     </div>
                 </div>
@@ -44,12 +44,12 @@
         <div class="col-sm-6 col-xl-3">
             <div class="card h-100">
                 <div class="card-body d-flex align-items-center p-3">
-                    <div class="rounded-3 bg-primary-subtle text-primary p-3 me-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <div class="rounded-3 bg-primary-subtle text-primary flex-shrink-0 me-2 me-xxl-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                         <i class="bi bi-graph-up-arrow fs-3"></i>
                     </div>
                     <div>
                         <div class="text-secondary small fw-medium">Omzet Bulan Ini</div>
-                        <h5 class="fw-bold text-primary mb-0">Rp {{ number_format($thisMonthSalesTotal, 0, ',', '.') }}</h5>
+                        <h5 class="fw-bold text-primary mb-0 text-nowrap" style="font-size: clamp(1.05rem, 1.2vw, 1.25rem);">Rp&nbsp;{{ number_format($thisMonthSalesTotal, 0, ',', '.') }}</h5>
                         <small class="text-muted" style="font-size: 0.75rem;">Total {{ $totalTransactions }} Transaksi ({{ now()->translatedFormat('M Y') }})</small>
                     </div>
                 </div>
@@ -60,12 +60,12 @@
         <div class="col-sm-6 col-xl-3">
             <div class="card h-100">
                 <div class="card-body d-flex align-items-center p-3">
-                    <div class="rounded-3 bg-warning-subtle text-warning-emphasis p-3 me-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <div class="rounded-3 bg-warning-subtle text-warning-emphasis flex-shrink-0 me-2 me-xxl-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                         <i class="bi bi-truck fs-3"></i>
                     </div>
                     <div>
                         <div class="text-secondary small fw-medium">Pengadaan Stok (Bulan Ini)</div>
-                        <h5 class="fw-bold text-dark mb-0">Rp {{ number_format($thisMonthPurchasesTotal, 0, ',', '.') }}</h5>
+                        <h5 class="fw-bold text-dark mb-0 text-nowrap" style="font-size: clamp(1.05rem, 1.2vw, 1.25rem);">Rp&nbsp;{{ number_format($thisMonthPurchasesTotal, 0, ',', '.') }}</h5>
                         <small class="text-muted" style="font-size: 0.75rem;">Total Pembelian Supplier</small>
                     </div>
                 </div>
@@ -76,13 +76,13 @@
         <div class="col-sm-6 col-xl-3">
             <div class="card h-100">
                 <div class="card-body d-flex align-items-center p-3">
-                    <div class="rounded-3 bg-info-subtle text-info-emphasis p-3 me-3 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px;">
+                    <div class="rounded-3 bg-info-subtle text-info-emphasis flex-shrink-0 me-2 me-xxl-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                         <i class="bi bi-boxes fs-3"></i>
                     </div>
                     <div>
                         <div class="text-secondary small fw-medium">Total Item Produk</div>
-                        <h5 class="fw-bold text-dark mb-0">{{ $totalProducts }} Produk</h5>
-                        <small class="text-muted" style="font-size: 0.75rem;">Terbagi dalam {{ $totalCategories }} Kategori</small>
+                        <h5 class="fw-bold text-dark mb-0 text-nowrap" style="font-size: clamp(1.05rem, 1.2vw, 1.25rem);">{{ $totalProducts }} Produk</h5>
+                        <small class="text-muted" style="font-size: 0.75rem;">{{ $totalCategories }} Kategori</small>
                     </div>
                 </div>
             </div>
