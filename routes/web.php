@@ -80,3 +80,16 @@ Route::middleware('auth')->group(function () {
     // Detail Produk (Diletakkan setelah route statis create & low-stock agar tidak tertimpa)
     Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 });
+
+// Route helper khusus mode local untuk keperluan screenshot & review antarmuka
+if (app()->environment('local')) {
+    Route::get('/dev-preview/{role}/{path?}', function ($role, $path = '') {
+        $user = \App\Models\User::where('role', $role)->first();
+        if ($user) {
+            \Illuminate\Support\Facades\Auth::login($user);
+        }
+        $target = '/' . ltrim(str_replace('__', '/', $path), '/');
+        return redirect($target ?: '/dashboard');
+    })->where('path', '.*');
+}
+

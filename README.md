@@ -210,18 +210,99 @@ Untuk mempermudah pengujian saat pemeriksaan dosen, sistem telah dilengkapi akun
 
 ---
 
-## 7. Instruksi & Hasil Pengujian Otomatis (Automated Feature Tests)
+## 7. Screenshots Halaman Utama & Alur Transaksi (Deliverables UTS)
 
-Untuk memvalidasi keandalan fungsional dan integritas sistem, jalankan perintah pengujian Laravel:
+Berikut adalah dokumentasi tangkapan layar antarmuka sistem **Gavora ERP** untuk memenuhi standar penilaian **Deliverables UTS (Screenshots Halaman Utama & Transaksi)**:
+
+### A. Halaman Utama & Monitoring Operasional
+
+#### 1. Halaman Login & Autentikasi Pengguna
+Halaman autentikasi aman dengan pemisahan hak akses berbasis peran (*Role-Based Access Control*). Dilengkapi tombol login instan 1-klik sebagai Customer untuk kemudahan pengujian dosen/asisten lab.
+![Halaman Login & Akses Cepat](docs/screenshots/01_login_page.png)
+
+#### 2. Dashboard Utama Admin & Staff
+Pusat analitik operasional dengan data agregat real-time dari database: Omzet Penjualan Hari Ini, Omzet Bulan Ini, Total Pengadaan Stok, Jumlah Master Produk Aktif, Peringatan Stok Rendah, dan Riwayat 5 Transaksi Terakhir.
+![Dashboard Utama Admin & Metrik Transaksi](docs/screenshots/02_dashboard_admin.png)
+
+#### 3. Monitoring Stok Menipis (Audit Gudang / Low-Stock Alert)
+Halaman audit inventaris otomatis menyaring produk dengan sisa stok &le; `minimum_stock`. Membantu staf gudang melakukan *restock* atau pemesanan ulang (*reorder*) tepat waktu sebelum terjadi kelangkaan barang.
+![Monitoring Stok Menipis](docs/screenshots/04_low_stock_monitoring.png)
+
+#### 4. Katalog & Master Data Produk
+Katalog seluruh barang dagang dengan informasi SKU, kategori, harga beli, harga jual resmi, indikator status stok, serta navigasi pencarian dan filter kategori.
+![Katalog & Master Data Produk](docs/screenshots/03_product_catalog.png)
+
+---
+
+### B. Modul Transaksi Pembelian (Stock-In / Pengadaan Barang Masuk)
+
+#### 5. Riwayat Transaksi Pembelian (Purchases Index)
+Menampilkan seluruh catatan transaksi pengadaan barang dari mitra pemasok (supplier), dilengkapi nomor faktur unik (`PUR-YYYYMM-XXXX`), tanggal, total nominal modal, nama supplier, dan status transaksi.
+![Riwayat Transaksi Pembelian](docs/screenshots/05_purchases_index.png)
+
+#### 6. Form Input Transaksi Pembelian Multi-Item (Stock-In Create)
+Form transaksi dinamis yang memungkinkan staf gudang menambahkan beberapa varian barang sekaligus dalam satu transaksi pengadaan dengan kalkulasi otomatis subtotal dan grand total modal.
+![Form Input Transaksi Pembelian Multi-Item](docs/screenshots/06_purchases_create.png)
+
+#### 7. Rincian Nota & Faktur Pembelian (Purchase Detail)
+Bukti sah transaksi barang masuk yang merinci harga beli satuan, kuantitas per item, dan total pengeluaran modal. Admin berwenang membatalkan transaksi yang akan memicu mutasi pemotongan stok kembali secara atomik.
+![Faktur & Rincian Transaksi Pembelian](docs/screenshots/07_purchases_detail.png)
+
+---
+
+### C. Modul Transaksi Penjualan Kasir (Stock-Out / POS Retail)
+
+#### 8. Riwayat Transaksi Penjualan (Sales Index)
+Daftar seluruh transaksi penjualan barang kepada pelanggan dengan kode invoice resmi (`INV-YYYYMM-XXXX`), nama petugas kasir yang melayani, waktu transaksi, dan total pembayaran.
+![Riwayat Transaksi Penjualan](docs/screenshots/08_sales_index.png)
+
+#### 9. Form POS Kasir Penjualan Multi-Item (Sales Create)
+Antarmuka kasir modern dengan proteksi validasi stok real-time. Dilindungi *pessimistic locking* (`lockForUpdate`) untuk mencegah overselling ketika beberapa kasir bertransaksi serentak.
+![Form POS Kasir Penjualan](docs/screenshots/09_sales_create.png)
+
+#### 10. Detail Struk Kasir & Faktur Penjualan (Sale Detail)
+Faktur resmi penjualan yang menampilkan rincian barang yang terjual dengan kalkulasi harga mutlak dari basis data server (*Zero Client-Side Trust*).
+![Struk / Faktur Penjualan Kasir](docs/screenshots/10_sales_detail.png)
+
+---
+
+### D. Master Data Manajemen & Otorisasi Pengguna
+
+#### 11. Master Data Kategori Produk
+Pengelolaan kategori barang guna menjaga kerapian pengelompokan inventaris dan integritas relasi tabel database.
+![Master Data Kategori Produk](docs/screenshots/11_master_categories.png)
+
+#### 12. Master Data Mitra Pemasok (Supplier)
+Direktori vendor penyedia stok barang dagang dengan nomor kontak dan alamat surat elektronik resmi.
+![Master Data Mitra Pemasok](docs/screenshots/12_master_suppliers.png)
+
+#### 13. Manajemen Pengguna & Otorisasi Karyawan
+Pengelolaan akun pengguna berbasis peran (*Role-Based Access Control*) yang memisahkan kewenangan antara **Admin**, **Staff**, dan **Customer**.
+![Manajemen Hak Akses Pengguna](docs/screenshots/13_users_management.png)
+
+---
+
+## 8. Instruksi & Hasil Pengujian Otomatis (Automated Feature Tests)
+
+Untuk memvalidasi keandalan fungsional, integritas referensial, dan keamanan sistem, jalankan perintah pengujian Laravel berikut:
 
 ```bash
 php artisan test
 ```
 
-### Hasil Eksekusi Test:
+### Bukti Eksekusi Test Suite (20 Tests Passed, 105 Assertions):
+![Bukti Hasil Pengujian Otomatis](docs/screenshots/14_test_cases_results.png)
+
+### Rincian Eksekusi Test Otomatis:
 ```text
    PASS  Tests\Unit\ExampleTest
   ✓ that true is true
+
+   PASS  Tests\Feature\CustomerRoleTest
+  ✓ guest can login instantly as customer
+  ✓ customer cannot access dashboard and is redirected to products
+  ✓ customer cannot access internal operations
+  ✓ customer can view product catalog and detail
 
    PASS  Tests\Feature\ExampleTest
   ✓ the application returns a successful response
@@ -235,14 +316,20 @@ php artisan test
   ✓ sale with insufficient stock is rejected and stock remains unchanged
   ✓ multi item sale atomicity rolls back when one item lacks stock
   ✓ staff gets 403 forbidden on admin exclusive routes
+  ✓ user self deletion and transaction protection
+  ✓ category and supplier integrity protection
+  ✓ cancellation reverses stock accurately
+  ✓ logout invalidates session and redirects
+  ✓ dashboard displays correct metrics
+  ✓ search and filter functionality
 
-  Tests:    10 passed (35 assertions)
-  Duration: 1.73s
+  Tests:    20 passed (105 assertions)
+  Duration: 1.78s
 ```
 
 ---
 
-## 8. Batasan Sistem (Scope & Limitations)
+## 9. Batasan Sistem (Scope & Limitations)
 
 - **Single Warehouse**: Sistem mengasumsikan satu titik lokasi gudang penyimpanan fisik.
 - **Transaksi Selesai Tidak Dapat Diubah Parsial**: Untuk menjaga konsistensi audit trail buku besar, transaksi yang sudah selesai (`completed`) tidak dapat diedit sebagian, melainkan harus dibatalkan (`cancelled`) oleh Admin dan dibuatkan transaksi baru.
@@ -250,7 +337,7 @@ php artisan test
 
 ---
 
-## 9. Bekal Jawaban Code Interview Dosen (UTS Cheatsheet)
+## 10. Bekal Jawaban Code Interview Dosen (UTS Cheatsheet)
 
 ### Q1: Di mana middleware alias didaftarkan pada Laravel 12? Mengapa tidak ada file `app/Http/Kernel.php`?
 > **Jawaban:** Pada Laravel 11 dan 12, struktur kernel telah dirampingkan. File `app/Http/Kernel.php` sudah dihapus oleh Laravel. Seluruh pendaftaran middleware global maupun alias kini dilakukan di file `bootstrap/app.php` menggunakan fungsi builder `->withMiddleware(function (Middleware $middleware) { $middleware->alias(['role' => \App\Http\Middleware\RoleMiddleware::class]); })`.
